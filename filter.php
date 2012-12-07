@@ -38,7 +38,7 @@ class filter_filtermenu extends moodle_text_filter {
     public $average_item_width = 32;
     public $menu_min_height = 4;
     public $average_item_height = 28;
-    public $menu_lines_max = 20;
+    public $menu_lines_max = 25;
 
 
 
@@ -88,7 +88,7 @@ class filter_filtermenu extends moodle_text_filter {
         $cattree = $this->load_cattree($categories);
 
         $filter = false;
-        // [Pascal UPO : we want the user's courses only]
+        // we want the user's courses only
         if ($USER->filtermenu == 'own') {
             $courses = enrol_get_users_courses($USER->id, "fullname ASC, shortname ASC");
             foreach ($courses as $course) {
@@ -97,10 +97,10 @@ class filter_filtermenu extends moodle_text_filter {
                 }
                 $this->has_courses($course);
             }
-        // [Pascal UPO : we want the courses with key only]
+        // we want the courses with key only
         } elseif ($USER->filtermenu == 'all') {
             $courses = get_courses('all', 'c.fullname ASC');
-        // [Pascal UPO : we want the courses open for guest ?]
+        // we want the courses open for guest ?
         } elseif ($USER->username == 'guest') {
             $courses = get_courses('all', 'c.fullname ASC');
             $filter = 'guest';
@@ -110,7 +110,7 @@ class filter_filtermenu extends moodle_text_filter {
             if (!$course->category) {
                 continue;
             }
-            // [Pascal UPO : we call the function with the parameter $filter]
+            // we call the function with the parameter $filter
             $this->has_courses($course, $filter);
         }
 
@@ -164,7 +164,7 @@ class filter_filtermenu extends moodle_text_filter {
      */
     private function has_courses($course, $filter=false) {
         global $categories;
-        // [Pascal UPO - if filter=true : add the courses with password only]
+        // if filter=true : add the courses with password only
         if (($filter=="guest" && $course->guest) || !$filter) {
             $categories[$course->category]->hascourses = true;
             $categories[$course->category]->courses[$course->sortorder] = $course;
@@ -202,16 +202,19 @@ class filter_filtermenu extends moodle_text_filter {
 					// Count courses
 					if (@$categories[$cat->id]->courses) {
 						foreach ($categories[$cat->id]->courses as $course) {
+							if (strlen($course->fullname) > $this->average_item_width)
+								$line=ceil(strlen($course->fullname)/$this->average_item_width);
+							else
+								$line = 1;
 							if (isset($nbcourse[$cat->id])) {
-								// display size limit
+								// if the display size limit isn't reached
 								if ($nbcourse[$cat->id] < $this->menu_lines_max) {
-									$nbcourse[$cat->id]=@$nbcourse[$cat->id]+1;
-									if (strlen($course->fullname) > $this->average_item_width)
-										$nbcourse[$cat->id]=@$nbcourse[$cat->id]+1;
+									$nbcourse[$cat->id]=@$nbcourse[$cat->id]+$line;
 								}
 							}
-							else
-								$nbcourse[$cat->id]=1;
+							else {
+								$nbcourse[$cat->id]=$line;
+							}
 						}
 					}
 				}
@@ -235,59 +238,61 @@ class filter_filtermenu extends moodle_text_filter {
 		$maxi=0;
 		$this->get_maxi(0);
 		foreach ($categories as $cat) {
-			if (((@$nbcat[$cat->id]) OR (@$nbcourse[$cat->id])) AND ((@$nbcat[$cat->id]+@$nbcourse[$cat->id]) > $maxi)) {
+			if (((@$nbcat[$cat->id]) OR (@$nbcourse[$cat->id])) AND ((@$nbcat[$cat->id]+@$nbcourse[$cat->id]) > $maxi))
 				$maxi = (@$nbcat[$cat->id]+@$nbcourse[$cat->id]);
-			}
 		}
 		if ($maxi < $this->menu_min_height)
 			$maxi = $this->menu_min_height;
 		$this->menu_lines_max = $maxi;
-
         $list = $this->menu_list(0);
-        if (empty($list)) {
-            $list = '<p>'.get_string('nocourse', 'filter_filtermenu').'</p>';
-        }
-        $menu = '';
-        // Import css file
-        $menu .= '<link type="text/css" href="'.$CFG->wwwroot.'/filter/filtermenu/css/filter_filtermenu.css" media="screen" rel="stylesheet" />'."\n";
-        if (file_exists($CFG->dirroot.'/theme/'.current_theme().'/style/filter_filtermenu.css')) {
-            $menu .= '<link type="text/css" href="'.$CFG->wwwroot.'/theme/'.current_theme().'/style/filter_filtermenu.css" media="screen" rel="stylesheet" />'."\n";
-        }
-        $menu .= '<script type="text/javascript" src="'.$CFG->wwwroot.'/filter/filtermenu/js/browserdetect.min.js"></script>'."\n";
-        $menu .= '<script type="text/javascript" src="'.$CFG->wwwroot.'/filter/filtermenu/js/dynMenu.min.js"></script>'."\n";
-		$menu .= '<style type="text/css">#ancre_menu, #menu, #menu ul { height: '.($this->average_item_height*$this->menu_lines_max).'px !important; }</style>';
+		
+		if (isset($USER->filtermenu)) {
+			$title = 'title_'.$USER->filtermenu;
+		} else {
+			$title = 'title_guest';
+		}
+		
+        if (!empty($list)) {
+			$menu = '';
+			// Import css file
+			$menu .= '<link type="text/css" href="'.$CFG->wwwroot.'/filter/filtermenu/css/filter_filtermenu.css" media="screen" rel="stylesheet" />'."\n";
+			if (file_exists($CFG->dirroot.'/theme/'.current_theme().'/style/filter_filtermenu.css')) {
+				$menu .= '<link type="text/css" href="'.$CFG->wwwroot.'/theme/'.current_theme().'/style/filter_filtermenu.css" media="screen" rel="stylesheet" />'."\n";
+			}
+			
+			// Print the menu
+			$menu .= '<script type="text/javascript" src="'.$CFG->wwwroot.'/filter/filtermenu/js/browserdetect.min.js"></script>'."\n";
+			$menu .= '<script type="text/javascript" src="'.$CFG->wwwroot.'/filter/filtermenu/js/dynMenu.min.js"></script>'."\n";
+			$menu .= '<style type="text/css">#ancre_menu, #menu, #menu ul { height: '.($this->average_item_height*$this->menu_lines_max).'px !important; }</style>';
 
-        // Print the menu
-        if (isset($USER->filtermenu)) {
-            $title = 'title_'.$USER->filtermenu;
-        } else {
-            $title = 'title_guest';
-        }
 
-        // Print switch [all courses / my courses only]
-        if ($USER->username <> 'guest') {
-            $menu .= '<p class="switch">';
-            if ($title == 'title_all') {
-                $menu .= '<a href="'.$CFG->wwwroot.'/?filtermenu=own">'.get_string('viewmycourses', 'filter_filtermenu').'</a>';
-            } else {
-                $menu .= '<a href="'.$CFG->wwwroot.'/?filtermenu=all">'.get_string('viewallcourses', 'filter_filtermenu').'</a>';
-            }
-            $menu .= '</p>'."\n";
-        }
+			// Print switch [all courses / my courses only]
+			if ($USER->username <> 'guest') {
+				$menu .= '<p class="switch">';
+				if ($title == 'title_all') {
+					$menu .= '<a href="'.$CFG->wwwroot.'/?filtermenu=own">'.get_string('viewmycourses', 'filter_filtermenu').'</a>';
+				} else {
+					$menu .= '<a href="'.$CFG->wwwroot.'/?filtermenu=all">'.get_string('viewallcourses', 'filter_filtermenu').'</a>';
+				}
+				$menu .= '</p>'."\n";
+			}
 
-        $menu .= '<h2>'.get_string($title, 'filter_filtermenu').'</h2>'."\n";
+			$menu .= '<h2>'.get_string($title, 'filter_filtermenu').'</h2>'."\n";
 
-        $menu .=
-            '<div id="filtermenu_container" align="center"><p id="ancre_menu"><ul id="menu">'."\n".
-            $list.
-            '</ul></p></div>'."\n".
-            '<script type="text/javascript">initMenu();</script>'."\n".
-        '';
-
-        if ($USER->username <> 'guest') {
-            // Print search box
-            $menu .= print_course_search('' ,true);
-        }
+			$menu .=
+				'<div id="filtermenu_container" align="center"><p id="ancre_menu"><ul id="menu">'."\n".
+				$list.
+				'</ul></p></div>'."\n".
+				'<script type="text/javascript">initMenu();</script>'."\n".
+			'';
+		}
+		// If $list is empty, we show a string and  the course_search
+		else {
+			$menu = '<h2>'.get_string($title, 'filter_filtermenu').'</h2>'."\n";		
+			$menu .= '<p>'.get_string('nocourse', 'filter_filtermenu').'</p>';		
+		}
+		
+		$menu .= print_course_search('' ,true);
 
         return $menu;
     }
@@ -329,16 +334,15 @@ class filter_filtermenu extends moodle_text_filter {
 
 						$course_counter = 0;
 						$displaylink = false;
-                        // [Pascal UPO - counter size limit]
+                        // counter size limit
                         foreach ($categories[$cat->id]->courses as $course) {
 
-							if (strlen($course->fullname) > $this->average_item_width) {
+							if (strlen($course->fullname) > $this->average_item_width)
 								$course_counter+= ceil(strlen($course->fullname) / $this->average_item_width);
-							} else {
+							else
 								$course_counter++;
-                            }
-
-							if ($course_counter < $this->menu_lines_max) {
+							// the "<=" is necessary ! do not use < only !
+							if ($course_counter <= $this->menu_lines_max) {
 								// Get user status in this course
 								$context = get_context_instance(CONTEXT_COURSE, $course->id);
                                 if ((has_capability('moodle/course:update', $context)) AND ($USER->id) AND ($USER->username <> 'guest')) {
@@ -373,13 +377,13 @@ class filter_filtermenu extends moodle_text_filter {
 
 								$list .= '<a title="'.$course->shortname." - ".$course->fullname.'" href="'.$CFG->wwwroot.'/course/view.php?id='.$course->id.'" >'.shorten_text($course->fullname,100,true).'</a>'."\n";
 							}
-							// [Pascal UPO - stop when the limit is reached]
+							// stop when the limit is reached
 							else {
 								$displaylink = true;
 								break;
 							}
 						}
-						// [Pascal UPO - if the limit was reached, display the link to the category]
+						// if the limit was reached, display the link to the category
 						if ($displaylink)
 							$list .= '<li class="toomanycourses"><a title="'.get_string('toomanycourses', 'filter_filtermenu').'" href="'.$CFG->wwwroot.'/course/category.php?id='.$cat->id.'&resort=name&sesskey='.$USER->sesskey.'" >'.get_string('seeallcourses', 'filter_filtermenu').'</a>';
 
