@@ -317,7 +317,7 @@ class filter_filtermenu extends moodle_text_filter {
                     } else {
                         $category_status = 'visible';
                     }
-                    $list .= "\n".'<li class="category'.$category_status.'"><span class="gauche"><a title="Afficher tous les cours de la catégorie '.$cat->name.'" href="'.$CFG->wwwroot.'/course/category.php?id='.$cat->id.'&resort=name&sesskey='.$USER->sesskey.'" ><img src="'.$CFG->wwwroot.'/filter/filtermenu/pix/folder.png" /></a></span><a href="javascript:;" title="'.$cat->name.'"><span class="droite"><img src="'.$CFG->wwwroot.'/filter/filtermenu/pix/arrow.png" /></span>'.shorten_text($cat->name,100,true).'</a><ul>'."\n";
+                    $list .= "\n".'<li class="category'.$category_status.'"><span class="gauche"><a title="Afficher tous les cours de la catégorie '.$cat->name.'" href="'.$CFG->wwwroot.'/course/category.php?id='.$cat->id.'&resort=name&sesskey='.$USER->sesskey.'" ><img src="'.$CFG->wwwroot.'/filter/filtermenu/pix/folder.png" /></a></span><a href="javascript:;" class="filtermenu_action" title="'.$cat->name.'"><span class="droite"><img src="'.$CFG->wwwroot.'/filter/filtermenu/pix/arrow.png" /></span>'.shorten_text($cat->name,100,true).'</a><ul>'."\n";
 
                     // Print sub categories
                     if ($this->menu_list($cat->id)) {

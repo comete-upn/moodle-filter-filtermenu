@@ -114,6 +114,10 @@ li.categoryvisible,
 li.categoryhidden {
 	background-color:#fff;
 }
+li.categoryvisible a.filtermenu_action,
+li.categoryhidden a.filtermenu_action{
+  padding-left: 20px;
+}
 li.coursevisible,
 li.coursehidden {
 	background-color:#eee;
