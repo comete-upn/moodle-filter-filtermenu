@@ -1,4 +1,4 @@
-<?PHP 
+<?PHP
 // French translation
 $string['filtername'] = 'filterMenu v2';
 $string['guest'] = 'Ce cours accepte les invités';
@@ -11,10 +11,11 @@ $string['howtofilter'] = 'Les 3 liens en haut à droite permettent de filtrer l\
 $string['howtosearch'] = 'Un moteur de recherche de cours est disponible pour chercher un cours.';
 $string['howtoguest'] = 'Les invités anonyme ne voient que les cours qui acceptent les invités. Le moteur de recherche de cours n\'est pas disponible pour les invités.';
 $string['info'] = 'Accéder aux informations du cours';
-$string['key'] = 'Ce cours nécessite d\'une clef d\'inscription';     
+$string['key'] = 'Ce cours nécessite d\'une clef d\'inscription';
 $string['legendtitle'] = 'Légende';
 $string['resume'] = 'Résumé';
 $string['student'] = 'Vous êtes étudiant dans ce cours';
+$string['editingteacher'] = 'Vous êtes enseignant dans ce cours';
 $string['teacher'] = 'Vous êtes enseignant dans ce cours';
 $string['title'] = 'Vos cours';
 $string['title_own'] = 'Vos cours';

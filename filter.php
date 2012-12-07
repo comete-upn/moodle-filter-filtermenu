@@ -203,7 +203,7 @@ class filter_filtermenu extends moodle_text_filter {
 					if (@$categories[$cat->id]->courses) {
 						foreach ($categories[$cat->id]->courses as $course) {
 							if (isset($nbcourse[$cat->id])) {
-								// display size limit								
+								// display size limit
 								if ($nbcourse[$cat->id] < $this->menu_lines_max) {
 									$nbcourse[$cat->id]=@$nbcourse[$cat->id]+1;
 									if (strlen($course->fullname) > $this->average_item_width)
@@ -317,7 +317,7 @@ class filter_filtermenu extends moodle_text_filter {
                     } else {
                         $category_status = 'visible';
                     }
-                    $list .= "\n".'<li class="category'.$category_status.'" title="'.$cat->name.'"><span class="droite"><a title="'.$cat->name.'" href="'.$CFG->wwwroot.'/course/category.php?id='.$cat->id.'&resort=name&sesskey='.$USER->sesskey.'" ><img src="'.$CFG->wwwroot.'/filter/filtermenu/pix/course.png" /></a></span><a href="javascript:;">'.shorten_text($cat->name,100,true).'</a><ul>'."\n";
+                    $list .= "\n".'<li class="category'.$category_status.'"><span class="gauche"><a title="Afficher tous les cours de la catégorie '.$cat->name.'" href="'.$CFG->wwwroot.'/course/category.php?id='.$cat->id.'&resort=name&sesskey='.$USER->sesskey.'" ><img src="'.$CFG->wwwroot.'/filter/filtermenu/pix/folder.png" /></a></span><a href="javascript:;" title="'.$cat->name.'"><span class="droite"><img src="'.$CFG->wwwroot.'/filter/filtermenu/pix/arrow.png" /></span>'.shorten_text($cat->name,100,true).'</a><ul>'."\n";
 
                     // Print sub categories
                     if ($this->menu_list($cat->id)) {
@@ -341,7 +341,9 @@ class filter_filtermenu extends moodle_text_filter {
 							if ($course_counter < $this->menu_lines_max) {
 								// Get user status in this course
 								$context = get_context_instance(CONTEXT_COURSE, $course->id);
-								if ((has_capability('moodle/course:update', $context)) AND ($USER->id) AND ($USER->username <> 'guest')) {
+                                if ((has_capability('moodle/course:update', $context)) AND ($USER->id) AND ($USER->username <> 'guest')) {
+                                    $user_status = 'editingteacher';
+                                } elseif ((has_capability('gradereport/grader:view', $context)) AND ($USER->id) AND ($USER->username <> 'guest')) {
 									$user_status = 'teacher';
 								} elseif ((has_capability('moodle/course:view', $context)) AND ($USER->id) AND ($USER->username <> 'guest')) {
 									$user_status = 'student';

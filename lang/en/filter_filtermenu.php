@@ -1,4 +1,4 @@
-<?PHP 
+<?PHP
 // English langage
 $string['filtername'] = 'filterMenu v2';
 $string['guest'] = 'This course allow guest access';
@@ -15,6 +15,7 @@ $string['key'] = 'This course need a key access';
 $string['legendtitle'] = 'Legend';
 $string['resume'] = 'Resume';
 $string['student'] = 'You are student in this course';
+$string['editingteacher'] = 'You are teacher in this course';
 $string['teacher'] = 'You are teacher in this course';
 $string['title'] = 'Explore your programe';
 $string['title_own'] = 'Explore your programe';
